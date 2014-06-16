@@ -3,6 +3,13 @@
 *.ko
 *.obj
 *.elf
+*.cmd
+*.mod.c
+*.order
+*.symvers
+.tmp_versions
+
+
 
 # Libraries
 *.lib
