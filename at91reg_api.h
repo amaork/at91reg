@@ -1,15 +1,30 @@
 #ifndef	_AT91REG_H_
 #define _AT91REG_H_
 
+#include <pthread.h>
 
 /* Macro */
-#define	AT91_PIOA_OFFSET	0x400
-#define AT91_PIOB_OFFSET	0x600
-#define AT91_PIOC_OFFSET	0x800
-#define AT91_PMC_OFFSET		0xc00
-#define AT91_MMAP_SIZE		0x1000
-#define AT91_REG_DEVICE		"/dev/at91reg"
+#define AT91_PIO_NB			3
+#define AT91_PIO_A			0
+#define AT91_PIO_B			1
+#define AT91_PIO_C			2
 
+/* PIO index start and end */
+#define AT91_PIO_START		0
+#define AT91_PIO_END		3
+
+/* PIO mmap base and size */
+#define	AT91_PIO_BASE		0x400
+#define AT91_PIO_SIZE		0x200
+
+/* Power manager offset */
+#define AT91_PMC_OFFSET		0xc00
+
+/* Mmap size */
+#define AT91_MMAP_SIZE		0x1000
+
+
+#define AT91_REG_DEVICE		"/dev/at91reg"
 
 typedef volatile unsigned int AT91_REG;
 
@@ -91,10 +106,18 @@ typedef struct PMC {
 **
 */
 typedef struct{
-	P_AT91_PIO	pio_a;
-	P_AT91_PIO	pio_b;
-	P_AT91_PIO	pio_c;
+
+	/* Resources */
 	P_AT91_PMC	pmc;
+	P_AT91_PIO	pio[AT91_PIO_NB];
+	
+	/* Mutex lock */
+	struct{
+	
+		pthread_mutex_t pmc;
+		pthread_mutex_t pio[AT91_PIO_NB];
+
+	}lock;
 }AT91_SCR, *P_AT91_SCR;
 
 

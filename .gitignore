@@ -8,6 +8,7 @@
 *.order
 *.symvers
 .tmp_versions
+depend
 
 
 
