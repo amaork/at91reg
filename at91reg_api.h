@@ -9,9 +9,26 @@
 #define AT91_PIO_B			1
 #define AT91_PIO_C			2
 
+#define AT91_PIO_PERA		'A'
+#define	AT91_PIO_PERB		'B'
+#define AT91_PIO_IN			'I'
+#define AT91_PIO_OUT		'O'
+
 /* PIO index start and end */
 #define AT91_PIO_START		0
 #define AT91_PIO_END		3
+#define IS_VALID_PIN(x)		((x) >= 0 && (x) < 32)
+#define IS_VALID_PORT(x)	((x) >= (AT91_PIO_START) && (x) < (AT91_PIO_END))
+
+
+/* Peripheral id */
+#define PIOA_PER_ID			2
+#define PIOB_PER_ID			3
+#define PIOC_PER_ID			4
+
+#define PER_ID_START		0
+#define PER_ID_END			31
+#define IS_VALID_PID(x)		((x) >= (PER_ID_START) && (x) < (PER_ID_END))
 
 /* PIO mmap base and size */
 #define	AT91_PIO_BASE		0x400
@@ -60,9 +77,9 @@ typedef struct PIO {
 	AT91_REG	 PIO_MDDR;	// Multi-driver Disable Register
 	AT91_REG	 PIO_MDSR;	// Multi-driver Status Register
 	AT91_REG	 Reserved3[1];	// 
-	AT91_REG	 PIO_PPUDR;	// Pull-up Disable Register
-	AT91_REG	 PIO_PPUER;	// Pull-up Enable Register
-	AT91_REG	 PIO_PPUSR;	// Pull-up Status Register
+	AT91_REG	 PIO_PUDR;	// Pull-up Disable Register
+	AT91_REG	 PIO_PUER;	// Pull-up Enable Register
+	AT91_REG	 PIO_PUSR;	// Pull-up Status Register
 	AT91_REG	 Reserved4[1];	// 
 	AT91_REG	 PIO_ASR;	// Select A Register
 	AT91_REG	 PIO_BSR;	// Select B Register
@@ -118,15 +135,39 @@ typedef struct{
 		pthread_mutex_t pio[AT91_PIO_NB];
 
 	}lock;
-}AT91_SCR, *P_AT91_SCR;
 
+	/* Init flags */
+	volatile unsigned int init;
+}AT91_SCR, *P_AT91_SCR;
 
 /*
 **	Functions declaration
 */
 
-int at91reg_mmap(P_AT91_SCR reg);
-int at91reg_unmap(void);
+
+/* Init and exit */
+int at91reg_init(void);
+int at91reg_exit(void);
+
+
+/* GPIO operating */
+int gpio_set_pin(unsigned int port, unsigned int pin);
+int gpio_clr_pin(unsigned int port, unsigned int pin);
+int gpio_get_pin(unsigned int port, unsigned int pin);
+
+int gpio_get_pin_desc(unsigned int port, unsigned int pin);
+
+int gpio_pin_oper(unsigned int port, unsigned int pin, unsigned int oper);
+
+int gpio_set_as_per_a(unsigned int port, unsigned int pin, int pull_up);
+int gpio_set_as_per_b(unsigned int port, unsigned int pin, int pull_up);
+int gpio_set_as_input(unsigned int port, unsigned int pin, int pull_up, int filter);
+int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int open_drain);
+
+
+/* Power management controller */
+int pmc_peripheral_status(unsigned int per_id);
+int pmc_peripheral_endis(unsigned int per_id, unsigned int endis);
 
 
 #endif

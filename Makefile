@@ -14,14 +14,18 @@ ARFLAGS		=	rcv
 
 all:modules libat91reg.a libat91reg.so
 
-libat91reg.a:at91reg_api.o
+libat91reg.a:
 	$(AR) $(ARFLAGS) $@ $^
 
-libat91reg.so:at91reg_api.o
+libat91reg.so:
 	$(CC) $(LDSHFLAGS) -o $@ $^
 
 depend:$(wildcard *.c)
 	$(CC) $(LDFLAGS) -MM $^ > $@
+
+libat91reg.a: 	init.o gpio.o pmc.o
+libat91reg.so:	init.o gpio.o pmc.o 
+
 
 modules:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
