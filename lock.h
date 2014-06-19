@@ -68,4 +68,11 @@ extern P_AT91_SCR __at91reg;
 								}\
 							}while(0)
 
+#define CHECK_PMC_REG(x)	do{ \
+								if (!IS_VALID_PMCREG(x)){\
+									fprintf(stderr, "PMC register id[%d] is invalid!\n", x);\
+									return -1;\
+								}\
+							}while(0)
+
 #endif

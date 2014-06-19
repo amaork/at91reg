@@ -50,6 +50,10 @@ typedef volatile unsigned int AT91_REG;
 
 
 /* AT91 System Controller Register  */
+/*
+**	AT91 Parallel Input Output Controller 
+*/
+
 #define	GPIO_PER	1
 #define GPIO_PDR	2
 #define	GPIO_PSR	3
@@ -92,10 +96,7 @@ typedef volatile unsigned int AT91_REG;
 #define AT91_GPIOREG_START	1
 #define AT91_GPIOREG_END		30
 #define IS_VALID_GPIOREG(x)	((x) >= (AT91_GPIOREG_START) && (x) < (AT91_GPIOREG_END))
-/*
-**	AT91 Parallel Input Output Controller 
-**	Block size : 512 bytes
-*/
+
 typedef struct PIO {
 	AT91_REG	 PIO_PER;	// PIO Enable Register
 	AT91_REG	 PIO_PDR;	// PIO Disable Register
@@ -139,6 +140,35 @@ typedef struct PIO {
 **	AT91 Power Management Controller
 **	Block size: 512
 */
+
+#define PMCR_SCER	1
+#define PMCR_SCDR	2
+#define PMCR_SCSR	3
+
+#define PMCR_PCER	4
+#define PMCR_PCDR	5
+#define PMCR_PCSR	6
+
+#define PMCR_CKGR_MOR	7
+#define PMCR_CKGR_MCFR	8
+#define PMCR_CKGR_PLLAR	9
+#define PMCR_CKGR_PLLBR	10
+
+#define PMCR_MCKR		11
+#define PMCR_PCK0		12
+#define PMCR_PCK1		13
+
+#define PMCR_IER		14
+#define PMCR_IDR		15
+#define PMCR_SR			16
+#define PMCR_IMR		17
+
+#define PMCR_PLLICPR	18
+
+#define AT91_PMCREG_START	1
+#define AT91_PMCREG_END		19
+#define IS_VALID_PMCREG(x)	((x) >= (AT91_PMCREG_START) && (x) < (AT91_PMCREG_END))
+
 typedef struct PMC {
 	AT91_REG	 PMC_SCER; 	// System Clock Enable Register
 	AT91_REG	 PMC_SCDR; 	// System Clock Disable Register
@@ -153,12 +183,16 @@ typedef struct PMC {
 	AT91_REG	 PMC_PLLAR; 	// PLL A Register
 	AT91_REG	 PMC_PLLBR; 	// PLL B Register
 	AT91_REG	 PMC_MCKR; 	// Master Clock Register
-	AT91_REG	 Reserved2[3]; 	// 
-	AT91_REG	 PMC_PCKR[8]; 	// Programmable Clock Register
+	AT91_REG	 Reserved2[2]; 	// 
+	AT91_REG	 PMC_PCK0; 	// Programmable Clock Register
+	AT91_REG	 PMC_PCK1;	
+	AT91_REG	 Reserved3[6];
 	AT91_REG	 PMC_IER; 	// Interrupt Enable Register
 	AT91_REG	 PMC_IDR; 	// Interrupt Disable Register
 	AT91_REG	 PMC_SR; 	// Status Register
 	AT91_REG	 PMC_IMR; 	// Interrupt Mask Register
+	AT91_REG	 Reserved4[4];
+	AT91_REG	 PMC_PLLICPR;// PLL Charge pump Current register
 }AT91_PMC, *P_AT91_PMC;
 
 
@@ -209,9 +243,81 @@ int gpio_set_as_input(unsigned int port, unsigned int pin, int pull_up, int filt
 int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int open_drain);
 
 
+/* Raw read/write */
+int gpio_raw_rw(unsigned int port, unsigned int reg, unsigned int rw, unsigned int *data);
+
+int gpio_raw_r_psr(unsigned int port, unsigned int *data);
+int gpio_raw_r_osr(unsigned int port, unsigned int *data);
+int gpio_raw_r_ifsr(unsigned int port, unsigned int *data);
+int gpio_raw_r_odsr(unsigned int port, unsigned int *data);
+int gpio_raw_r_prsr(unsigned int port, unsigned int *data);
+int gpio_raw_r_imr(unsigned int port, unsigned int *data);
+int gpio_raw_r_isr(unsigned int port, unsigned int *data);
+int gpio_raw_r_mdsr(unsigned int port, unsigned int *data);
+int gpio_raw_r_pusr(unsigned int port, unsigned int *data);
+int gpio_raw_r_absr(unsigned int port, unsigned int *data);
+int gpio_raw_r_owsr(unsigned int port, unsigned int *data);
+
+
+int gpio_raw_w_per(unsigned int port, unsigned int data);
+int gpio_raw_w_pdr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_oer(unsigned int port, unsigned int data);
+int gpio_raw_w_odr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_ifer(unsigned int port, unsigned int data);
+int gpio_raw_w_ifdr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_sodr(unsigned int port, unsigned int data);
+int gpio_raw_w_codr(unsigned int port, unsigned int data);
+int gpio_raw_w_odsr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_ier(unsigned int port, unsigned int data);
+int gpio_raw_w_idr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_mder(unsigned int port, unsigned int data);
+int gpio_raw_w_mddr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_pudr(unsigned int port, unsigned int data);
+int gpio_raw_w_puer(unsigned int port, unsigned int data);
+
+int gpio_raw_w_asr(unsigned int port, unsigned int data);
+int gpio_raw_w_bsr(unsigned int port, unsigned int data);
+
+int gpio_raw_w_ower(unsigned int port, unsigned int data);
+int gpio_raw_w_owdr(unsigned int port, unsigned int data);
+
 /* Power management controller */
 int pmc_peripheral_status(unsigned int per_id);
 int pmc_peripheral_endis(unsigned int per_id, unsigned int endis);
 
+/* Raw read/write */
+int pmc_raw_rw(unsigned int reg, unsigned int rw, unsigned int *data);
+
+int pmc_raw_r_pcsr(unsigned int *data);
+int pmc_raw_r_scsr(unsigned int *data);
+int pmc_raw_r_ckgr_mor(unsigned int *data);
+int pmc_raw_r_ckgr_mcfr(unsigned int *data);
+int pmc_raw_r_ckgr_pllar(unsigned int *data);
+int pmc_raw_r_ckgr_pllbr(unsigned int *data);
+int pmc_raw_r_mckr(unsigned int *data);
+int pmc_raw_r_pck0(unsigned int *data);
+int pmc_raw_r_pck1(unsigned int *data);
+int pmc_raw_r_sr(unsigned int *data);
+int pmc_raw_r_imr(unsigned int *data);
+
+int pmc_raw_w_scer(unsigned int data);
+int pmc_raw_w_scdr(unsigned int data);
+int pmc_raw_w_pcer(unsigned int data);
+int pmc_raw_w_pcdr(unsigned int data);
+int pmc_raw_w_ckgr_mor(unsigned int data);
+int pmc_raw_w_ckgr_pllar(unsigned int data);
+int pmc_raw_w_ckgr_pllbr(unsigned int data);
+int pmc_raw_w_mckr(unsigned int data);
+int pmc_raw_w_pck0(unsigned int data);
+int pmc_raw_w_pck1(unsigned int data);
+int pmc_raw_w_ier(unsigned int data);
+int pmc_raw_w_idr(unsigned int data);
+int pmc_raw_w_pllicpr(unsigned int data);
 
 #endif
