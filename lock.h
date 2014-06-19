@@ -54,6 +54,13 @@ extern P_AT91_SCR __at91reg;
 								}\
 							}while(0)
 
+#define CHECK_GPIO_REG(x)	do{ \
+								if (!IS_VALID_GPIOREG(x)){\
+									fprintf(stderr, "GPIO Reg[%u] is invalid!\n", x);\
+									return -1;\
+								}\
+							}while(0)
+
 #define CHECK_PER_ID(x)		do{ \
 								if (!IS_VALID_PID(x)){\
 									fprintf(stderr, "Peripheral id[%d] is invalid!\n", x);\

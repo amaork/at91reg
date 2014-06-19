@@ -3,6 +3,9 @@
 
 #include <pthread.h>
 
+#define READ_OPER			0
+#define WRITE_OPER			1
+
 /* Macro */
 #define AT91_PIO_NB			3
 #define AT91_PIO_A			0
@@ -47,7 +50,48 @@ typedef volatile unsigned int AT91_REG;
 
 
 /* AT91 System Controller Register  */
+#define	GPIO_PER	1
+#define GPIO_PDR	2
+#define	GPIO_PSR	3
 
+#define GPIO_OER	4
+#define GPIO_ODR	5
+#define GPIO_OSR	6
+
+#define GPIO_IFER	7
+#define GPIO_IFDR	8
+#define GPIO_IFSR	9
+
+#define GPIO_SODR	10
+#define GPIO_CODR	11
+
+#define GPIO_ODSR	12
+#define GPIO_PDSR	13
+
+#define	GPIO_IER	14
+#define GPIO_IDR	15
+#define GPIO_IMR	16
+#define GPIO_ISR	17
+
+#define GPIO_MDER	18
+#define GPIO_MDDR	19
+#define GPIO_MDSR	20
+
+#define GPIO_PUDR	21
+#define GPIO_PUER	22
+#define GPIO_PUSR	23
+
+#define GPIO_ASR	24
+#define GPIO_BSR	25
+#define GPIO_ABSR	26
+
+#define GPIO_OWER	27
+#define GPIO_OWDR	28
+#define GPIO_OWSR	29
+
+#define AT91_GPIOREG_START	1
+#define AT91_GPIOREG_END		30
+#define IS_VALID_GPIOREG(x)	((x) >= (AT91_GPIOREG_START) && (x) < (AT91_GPIOREG_END))
 /*
 **	AT91 Parallel Input Output Controller 
 **	Block size : 512 bytes

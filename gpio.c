@@ -336,3 +336,278 @@ int gpio_get_pin(unsigned int port, unsigned int pin)
 	return st;
 }
 
+/************************************************************************************
+**	@brief	:	read or write gpio register
+**	#prot	:	which port AT91_REG_[A B C]
+**	#reg	:	which register will read or write GPIO_XXXX
+**	#rw		:	zero read not zero write
+**	#data	:	if is read(rw == 0) value will save at data, if is write(rw == 1) will
+				write data save at data
+**	@return	:	success return 0, failed return -1
+*************************************************************************************/
+int gpio_raw_rw(unsigned int port, unsigned int reg, unsigned int rw, unsigned int *data)
+{
+	int ret = 0;
+
+	/* Check port */		
+	CHECK_GPIO_PORT(port);
+	
+	/* Check reg */
+	CHECK_GPIO_REG(reg);
+
+	/* Lock */
+	LOCK_GPIO(port);
+
+	/* Read */
+	if (rw == 0){
+
+		switch (reg){
+
+			/* Pio status */
+			case 	GPIO_PSR	:	*data	=	__at91reg->pio[port]->PIO_PSR;break;
+
+			/* Output status */
+			case 	GPIO_OSR	:	*data	=	__at91reg->pio[port]->PIO_OSR;break;
+
+			/* Input filter */
+			case 	GPIO_IFSR	:	*data	=	__at91reg->pio[port]->PIO_IFSR;break;
+	
+			/* Output and input status */
+			case 	GPIO_ODSR	:	*data	=	__at91reg->pio[port]->PIO_ODSR;break;
+			case 	GPIO_PDSR	:	*data	=	__at91reg->pio[port]->PIO_PDSR;break;
+	
+			/* Interrupt */
+			case 	GPIO_IMR	:	*data	=	__at91reg->pio[port]->PIO_IMR;break;
+			case 	GPIO_ISR	:	*data	=	__at91reg->pio[port]->PIO_ISR;break;
+	
+			/* Multi-driver */
+			case 	GPIO_MDSR	:	*data	=	__at91reg->pio[port]->PIO_MDSR;break;
+			
+			/* Pull-up */
+			case 	GPIO_PUSR	:	*data	=	__at91reg->pio[port]->PIO_PUSR;break;
+		
+			/* Peripheral a, b */
+			case 	GPIO_ABSR	:	*data	=	__at91reg->pio[port]->PIO_ABSR;break;
+			
+			/* Ouput write */
+			case 	GPIO_OWSR	:	*data	=	__at91reg->pio[port]->PIO_OWSR;break;
+
+			default	:	fprintf(stderr, "This register[%u] is write-only!\n", reg); ret = -1;break;
+		}	
+	}
+	/* Write */
+	else{
+
+		switch (reg){
+
+			/* Pio enable, disable, status */
+			case 	GPIO_PER	:	__at91reg->pio[port]->PIO_PER	|=	*data;break;
+			case 	GPIO_PDR	:	__at91reg->pio[port]->PIO_PDR	|=	*data;break;
+
+			/* Output enable, disable, status */
+			case 	GPIO_OER	:	__at91reg->pio[port]->PIO_OER	|=	*data;break;
+			case 	GPIO_ODR	:	__at91reg->pio[port]->PIO_ODR	|=	*data;break;
+
+			/* Input filter */
+			case 	GPIO_IFER	:	__at91reg->pio[port]->PIO_IFER	|=	*data;break;
+			case 	GPIO_IFDR	:	__at91reg->pio[port]->PIO_IFDR	|=	*data;break;
+	
+			/* Set and clear output */
+			case 	GPIO_SODR	:	__at91reg->pio[port]->PIO_SODR	|=	*data;break;
+			case 	GPIO_CODR	:	__at91reg->pio[port]->PIO_CODR	|=	*data;break;
+			case 	GPIO_ODSR	:	__at91reg->pio[port]->PIO_ODSR	|=	*data;break;
+	
+			/* Interrupt */
+			case 	GPIO_IER	:	__at91reg->pio[port]->PIO_IER	|=	*data;break;
+			case 	GPIO_IDR	:	__at91reg->pio[port]->PIO_IDR	|=	*data;break;
+	
+			/* Multi-driver */
+			case 	GPIO_MDER	:	__at91reg->pio[port]->PIO_MDER	|=	*data;break;
+			case 	GPIO_MDDR	:	__at91reg->pio[port]->PIO_MDDR	|=	*data;break;
+			
+			/* Pull-up */
+			case 	GPIO_PUDR	:	__at91reg->pio[port]->PIO_PUDR	|=	*data;break;
+			case 	GPIO_PUER	:	__at91reg->pio[port]->PIO_PUER	|=	*data;break;
+		
+			/* Peripheral a, b */
+			case 	GPIO_ASR	:	__at91reg->pio[port]->PIO_ASR	|=	*data;break;
+			case 	GPIO_BSR	:	__at91reg->pio[port]->PIO_BSR	|=	*data;break;
+			
+			/* Ouput write */
+			case 	GPIO_OWER	:	__at91reg->pio[port]->PIO_OWER	|=	*data;break;
+			case 	GPIO_OWDR	:	__at91reg->pio[port]->PIO_OWDR	|=	*data;break;
+
+			default	:	fprintf(stderr, "This register[%u] is read-only!\n", reg); ret = -1;break;
+		}	
+
+	}
+
+	/* Unlock */
+	UNLOCK_GPIO(port);
+	
+	return ret;
+}
+
+
+
+/************************************************************************************
+**	@brief	:	read gpio register
+**	#port	:	which port will write AT91_PIO_X
+**	#data	:	read data
+**	@return	:	success return 0, failed return -1
+*************************************************************************************/
+int gpio_raw_r_psr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_PSR, READ_OPER, data);
+}
+
+int gpio_raw_r_osr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_OSR, READ_OPER, data);
+}
+
+int gpio_raw_r_ifsr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_IFSR, READ_OPER, data);
+}
+
+int gpio_raw_r_odsr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_ODSR, READ_OPER, data);
+}
+
+int gpio_raw_r_prsr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_PDSR, READ_OPER, data);
+}
+
+int gpio_raw_r_imr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_IMR, READ_OPER, data);
+}
+
+int gpio_raw_r_isr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_ISR, READ_OPER, data);
+}
+
+int gpio_raw_r_mdsr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_MDSR, READ_OPER, data);
+}
+
+int gpio_raw_r_pusr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_PUSR, READ_OPER, data);
+}
+
+int gpio_raw_r_absr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_ABSR, READ_OPER, data);
+}
+
+int gpio_raw_r_owsr(unsigned int port, unsigned int *data)
+{
+	return gpio_raw_rw(port, GPIO_OWSR, READ_OPER, data);
+}
+
+/************************************************************************************
+**	@brief	:	write gpio register
+**	#port	:	which port will write AT91_PIO_X
+**	#data	:	write data
+**	@return	:	success return 0, failed return -1
+*************************************************************************************/
+int gpio_raw_w_per(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_PER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_pdr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_PDR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_oer(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_OER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_odr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_ODR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_ifer(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_IFER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_ifdr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_IFDR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_sodr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_SODR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_codr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_CODR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_odsr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_ODSR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_ier(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_IER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_idr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_IDR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_mder(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_MDER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_mddr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_MDDR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_pudr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_PUDR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_puer(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_PUER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_asr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_ASR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_bsr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_BSR, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_ower(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_OWER, WRITE_OPER, &data);
+}
+
+int gpio_raw_w_owdr(unsigned int port, unsigned int data)
+{
+	return gpio_raw_rw(port, GPIO_OWDR, WRITE_OPER, &data);
+}
