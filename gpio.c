@@ -73,7 +73,6 @@ int gpio_set_as_input(unsigned int port, unsigned int pin, int pull_up, int filt
 **	#pin		:	which pin in port will set as output 0 - 31
 **	#pull_up	:	enable or disable pull up resistor
 **	#open_drain	:	enable or disbale open drain
-**	#reg		:	
 **	@return		:	success return 0, fialed return -1
 **********************************************************************************/
 int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int open_drain)
@@ -110,6 +109,9 @@ int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int ope
 	/* Enbale output */
 	__at91reg->pio[port]->PIO_OER	|= (1 << pin);	
 
+	/* Disable output write */
+	__at91reg->pio[port]->PIO_OWDR	|= (1 << pin);
+
 	/* Enable pio controller */
 	__at91reg->pio[port]->PIO_PER  	|= (1 << pin);
 
@@ -117,6 +119,60 @@ int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int ope
 	UNLOCK_GPIO(port);
 
  	return 0;
+}
+
+/**********************************************************************************
+**	@brief		:	set gpio pin as sync output port
+**	#port		:	which port AT91_PIO_X
+**	#pin_mask	:	which pins will set as sync output, set bit as 1
+**	#pull_up	:	enable or disable pull up resistor
+**	#open_drain	:	enable or disable open drain
+**	@return		:	success return 0, fialed return -1
+**********************************************************************************/
+int gpio_set_as_sync_output(unsigned int port, unsigned int pin_mask, int pull_up, int open_drain)
+{
+	/* Check port and pin */
+	CHECK_GPIO_PORT(port);
+
+	/* Get lock */
+	LOCK_GPIO(port);
+
+	/* Pull up resistor */	
+	if (pull_up){
+
+		__at91reg->pio[port]->PIO_PUER |= pin_mask;
+	}
+	else{
+		__at91reg->pio[port]->PIO_PUDR |= pin_mask;
+	}
+
+	/* Open drain */
+	if (open_drain){
+	
+		__at91reg->pio[port]->PIO_MDER |= pin_mask;
+	}
+	else{
+	
+		__at91reg->pio[port]->PIO_MDDR |= pin_mask;	
+	}
+
+	/* Disable interrupt */
+	__at91reg->pio[port]->PIO_IDR	|= pin_mask;
+	
+	/* Enbale output */
+	__at91reg->pio[port]->PIO_OER	|= pin_mask;	
+
+	/* Enable sync output */
+	__at91reg->pio[port]->PIO_OWER	|= pin_mask;
+
+	/* Enable pio controller */
+	__at91reg->pio[port]->PIO_PER  	|= pin_mask;
+
+	/* Unlock */
+	UNLOCK_GPIO(port);
+
+	
+	return 0;
 }
 
 
@@ -294,22 +350,68 @@ int gpio_set_pin(unsigned int port, unsigned int pin)
 	return gpio_pin_oper(port, pin, 1);
 }
 
+int gpio_sync_write(unsigned int port, unsigned int pin_mask, unsigned int data)
+{
+	unsigned int osr = 0;
+	unsigned int psr = 0;
+	unsigned int owsr = 0;
+
+	/* Get PIN_PSR */
+	if (gpio_raw_r_psr(port, &psr)){
+
+		fprintf(stderr, "Read PIN_PSR raw data failed!\n");
+		return -1;
+	}
+
+	/* Check if pin is controled by Pio cotroller */
+	if ((psr & pin_mask) != pin_mask){
+
+		fprintf(stderr, "These pins[%X] do not control by pio controller!\n", (psr & pin_mask) ^ pin_mask);
+		return -1;
+	}
+
+	/* Read PIN_OSR */
+	if (gpio_raw_r_osr(port, &osr)){
+
+		fprintf(stderr, "Read PIN_OSR raw data failed!\n");
+		return -1;
+	}
+
+	/* Check if pin is a output pin */	
+	if ((osr & pin_mask) != pin_mask){
+
+		fprintf(stderr, "These pins[%X] do not output pins!\n", (osr & pin_mask) ^ pin_mask);
+		return -1;
+	}
+
+	/* Read PIN_OWSR */
+	if (gpio_raw_r_owsr(port, &owsr)){
+
+		fprintf(stderr, "These pins[%X] do not support sync write!\n", (owsr & pin_mask) ^ pin_mask);
+		return -1;
+	}		
+
+	/* Sync write */
+	return gpio_raw_w_odsr(port, data);
+}
+
 int gpio_clr_pin(unsigned int port, unsigned int pin)
 {
 	return gpio_pin_oper(port, pin, 0);
 }
 
 
+
 /**********************************************************************************KE
 **	@brief	:	get gpio pin value  
 **	#port	:	gpio port AT91_PIO_[A B C]
 **	#pin	:	gpio pin [0 - 31]
-**	@return	:	success return gpio pin value, failed return -1
+**	#data	:	get gpio pin value save to pin
+**	@return	:	success return 0, failed return -1
 **********************************************************************************/
-int gpio_get_pin(unsigned int port, unsigned int pin)
+int gpio_get_pin(unsigned int port, unsigned int pin, unsigned int *data)
 {
 	int desc;
-	unsigned int st;
 
 	/* First get pin desc */
 	if ((desc = gpio_get_pin_desc(port, pin)) == -1){
@@ -326,14 +428,14 @@ int gpio_get_pin(unsigned int port, unsigned int pin)
 
 		case AT91_PIO_OUT	:	
 		case AT91_PIO_PERA	:
-		case AT91_PIO_PERB	:	st = (__at91reg->pio[port]->PIO_ODSR & (1 << pin)) >> pin;break;
-		case AT91_PIO_IN	:	st = (__at91reg->pio[port]->PIO_PDSR & (1 << pin)) >> pin;break;
+		case AT91_PIO_PERB	:	*data = (__at91reg->pio[port]->PIO_ODSR & (1 << pin)) >> pin;break;
+		case AT91_PIO_IN	:	*data = (__at91reg->pio[port]->PIO_PDSR & (1 << pin)) >> pin;break;
 	}
 
 	/* Unlock */
 	UNLOCK_GPIO(port);
 
-	return st;
+	return 0;
 }
 
 /************************************************************************************
@@ -415,7 +517,7 @@ int gpio_raw_rw(unsigned int port, unsigned int reg, unsigned int rw, unsigned i
 			/* Set and clear output */
 			case 	GPIO_SODR	:	__at91reg->pio[port]->PIO_SODR	|=	*data;break;
 			case 	GPIO_CODR	:	__at91reg->pio[port]->PIO_CODR	|=	*data;break;
-			case 	GPIO_ODSR	:	__at91reg->pio[port]->PIO_ODSR	|=	*data;break;
+			case 	GPIO_ODSR	:	__at91reg->pio[port]->PIO_ODSR	=	*data;break;
 	
 			/* Interrupt */
 			case 	GPIO_IER	:	__at91reg->pio[port]->PIO_IER	|=	*data;break;

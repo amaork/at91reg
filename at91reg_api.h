@@ -231,8 +231,7 @@ int at91reg_exit(void);
 /* GPIO operating */
 int gpio_set_pin(unsigned int port, unsigned int pin);
 int gpio_clr_pin(unsigned int port, unsigned int pin);
-int gpio_get_pin(unsigned int port, unsigned int pin);
-
+int gpio_get_pin(unsigned int port, unsigned int pin, unsigned int *data);
 int gpio_get_pin_desc(unsigned int port, unsigned int pin);
 
 int gpio_pin_oper(unsigned int port, unsigned int pin, unsigned int oper);
@@ -241,6 +240,10 @@ int gpio_set_as_per_a(unsigned int port, unsigned int pin, int pull_up);
 int gpio_set_as_per_b(unsigned int port, unsigned int pin, int pull_up);
 int gpio_set_as_input(unsigned int port, unsigned int pin, int pull_up, int filter);
 int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int open_drain);
+
+
+int gpio_sync_write(unsigned int port, unsigned int pin_mask, unsigned int data);
+int gpio_set_as_sync_output(unsigned int port, unsigned int pin_mask, int pull_up, int open_drain);
 
 
 /* Raw read/write */
