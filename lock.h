@@ -6,10 +6,14 @@
 #include <string.h>
 
 /* Normal user please do not refercrence this var */
-extern P_AT91_SCR __at91reg;
+extern AT91_SCR __at91reg;
 
 #define LOCK_PMC()		do{ \
-							if (pthread_mutex_lock(&__at91reg->lock.pmc)){ \
+							if (__at91reg.init == 0){\
+								fprintf(stderr, "%s[%s] --> [%d] --> AT91reg module uninit!!!\n", __FILE__,__func__, __LINE__);\
+								return -1;\
+							}\
+							if (pthread_mutex_lock(&__at91reg.lock.pmc)){ \
 								fprintf(stderr, "%s[%s] --> [%d] --> Lock pmc error:%s\n", __FILE__,__func__, __LINE__, strerror(errno));\
 								return -1;\
 							}\
@@ -17,7 +21,7 @@ extern P_AT91_SCR __at91reg;
 
 
 #define UNLOCK_PMC()	do{ \
-							if (pthread_mutex_unlock(&__at91reg->lock.pmc)){ \
+							if (pthread_mutex_unlock(&__at91reg.lock.pmc)){ \
 								fprintf(stderr, "%s[%s] --> [%d] --> Unlock pmc error:%s\n", __FILE__, __func__, __LINE__, strerror(errno));\
 								return -1;\
 							}\
@@ -25,7 +29,11 @@ extern P_AT91_SCR __at91reg;
 
 
 #define LOCK_GPIO(x)	do{ \
-							if (pthread_mutex_lock(&__at91reg->lock.pio[(x)])){ \
+							if (__at91reg.init == 0){\
+								fprintf(stderr, "%s[%s] --> [%d] --> AT91reg module uninit!!!\n", __FILE__,__func__, __LINE__);\
+								return -1;\
+							}\
+							if (pthread_mutex_lock(&__at91reg.lock.pio[(x)])){ \
 								fprintf(stderr, "%s[%s] --> [%d] --> Lock pio error:%s\n", __FILE__,__func__, __LINE__, strerror(errno));\
 								return -1;\
 							}\
@@ -33,7 +41,7 @@ extern P_AT91_SCR __at91reg;
 
 
 #define UNLOCK_GPIO(x)	do{ \
-							if (pthread_mutex_unlock(&__at91reg->lock.pio[(x)])){\
+							if (pthread_mutex_unlock(&__at91reg.lock.pio[(x)])){\
 								fprintf(stderr, "%s[%s] --> [%d] --> Unlock pio error:%s\n", __FILE__, __func__, __LINE__, strerror(errno));\
 								return -1;\
 							}\

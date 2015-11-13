@@ -12,7 +12,7 @@ LDSHFLAGS	=	-rdynamic -shared
 ARFLAGS		=	rcv
 
 
-all:modules libat91reg.a libat91reg.so
+all:libat91reg.a libat91reg.so
 
 libat91reg.a:
 	$(AR) $(ARFLAGS) $@ $^

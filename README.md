@@ -37,7 +37,7 @@ This repository include a linux device driver module(`at91reg.c`) and a userspac
 		#include "at91reg_api.h"
 
 		/* Mmap at91reg */
-		if (at91reg_mmap() == -1){
+		if (at91reg_mmap("/dev/at91reg") == -1){
 
 			fprintf(stderr, "Mmap at91reg failed!\n");
 			return -1;

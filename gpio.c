@@ -1,4 +1,5 @@
 #include "at91reg_api.h"
+#include "at91reg.h"
 #include "lock.h"
 
 /**********************************************************************************
@@ -21,33 +22,33 @@ int gpio_set_as_input(unsigned int port, unsigned int pin, int pull_up, int filt
 	/* Pull up resistor */	
 	if (pull_up){
 
-		__at91reg->pio[port]->PIO_PUER |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUER |= (1 << pin);
 	}
 	else{
-		__at91reg->pio[port]->PIO_PUDR |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUDR |= (1 << pin);
 	}
 	
 	/* Glitch filter */
 	if (filter){
 
-		__at91reg->pio[port]->PIO_IFER |= (1 << pin);
+		__at91reg.pio[port]->PIO_IFER |= (1 << pin);
 	}
 	else{
 
-		__at91reg->pio[port]->PIO_IFDR |= (1 << pin);
+		__at91reg.pio[port]->PIO_IFDR |= (1 << pin);
 	}	
 
 	/* Disable output */
-	__at91reg->pio[port]->PIO_ODR 	|= (1 << pin);
+	__at91reg.pio[port]->PIO_ODR 	|= (1 << pin);
 
 	/* Disable interrupt */
-	__at91reg->pio[port]->PIO_IDR 	|= (1 << pin);
+	__at91reg.pio[port]->PIO_IDR 	|= (1 << pin);
 
 	/* Disable multi-driver */
-	__at91reg->pio[port]->PIO_MDDR 	|= (1 << pin);
+	__at91reg.pio[port]->PIO_MDDR 	|= (1 << pin);
 
 	/* Enable pio controller */
-	__at91reg->pio[port]->PIO_PER  	|= (1 << pin);
+	__at91reg.pio[port]->PIO_PER  	|= (1 << pin);
 
 	/* Unlock */
 	UNLOCK_GPIO(port);	
@@ -87,33 +88,33 @@ int gpio_set_as_output(unsigned int port, unsigned int pin, int pull_up, int ope
 	/* Pull up resistor */	
 	if (pull_up){
 
-		__at91reg->pio[port]->PIO_PUER |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUER |= (1 << pin);
 	}
 	else{
-		__at91reg->pio[port]->PIO_PUDR |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUDR |= (1 << pin);
 	}
 
 	/* Open drain */
 	if (open_drain){
 	
-		__at91reg->pio[port]->PIO_MDER |= (1 << pin);
+		__at91reg.pio[port]->PIO_MDER |= (1 << pin);
 	}
 	else{
 	
-		__at91reg->pio[port]->PIO_MDDR |= (1 << pin);	
+		__at91reg.pio[port]->PIO_MDDR |= (1 << pin);	
 	}
 
 	/* Disable interrupt */
-	__at91reg->pio[port]->PIO_IDR	|= (1 << pin);
+	__at91reg.pio[port]->PIO_IDR	|= (1 << pin);
 	
 	/* Enbale output */
-	__at91reg->pio[port]->PIO_OER	|= (1 << pin);	
+	__at91reg.pio[port]->PIO_OER	|= (1 << pin);	
 
 	/* Disable output write */
-	__at91reg->pio[port]->PIO_OWDR	|= (1 << pin);
+	__at91reg.pio[port]->PIO_OWDR	|= (1 << pin);
 
 	/* Enable pio controller */
-	__at91reg->pio[port]->PIO_PER  	|= (1 << pin);
+	__at91reg.pio[port]->PIO_PER  	|= (1 << pin);
 
 	/* Unlock */
 	UNLOCK_GPIO(port);
@@ -140,33 +141,33 @@ int gpio_set_as_sync_output(unsigned int port, unsigned int pin_mask, int pull_u
 	/* Pull up resistor */	
 	if (pull_up){
 
-		__at91reg->pio[port]->PIO_PUER |= pin_mask;
+		__at91reg.pio[port]->PIO_PUER |= pin_mask;
 	}
 	else{
-		__at91reg->pio[port]->PIO_PUDR |= pin_mask;
+		__at91reg.pio[port]->PIO_PUDR |= pin_mask;
 	}
 
 	/* Open drain */
 	if (open_drain){
 	
-		__at91reg->pio[port]->PIO_MDER |= pin_mask;
+		__at91reg.pio[port]->PIO_MDER |= pin_mask;
 	}
 	else{
 	
-		__at91reg->pio[port]->PIO_MDDR |= pin_mask;	
+		__at91reg.pio[port]->PIO_MDDR |= pin_mask;	
 	}
 
 	/* Disable interrupt */
-	__at91reg->pio[port]->PIO_IDR	|= pin_mask;
+	__at91reg.pio[port]->PIO_IDR	|= pin_mask;
 	
 	/* Enbale output */
-	__at91reg->pio[port]->PIO_OER	|= pin_mask;	
+	__at91reg.pio[port]->PIO_OER	|= pin_mask;	
 
 	/* Enable sync output */
-	__at91reg->pio[port]->PIO_OWER	|= pin_mask;
+	__at91reg.pio[port]->PIO_OWER	|= pin_mask;
 
 	/* Enable pio controller */
-	__at91reg->pio[port]->PIO_PER  	|= pin_mask;
+	__at91reg.pio[port]->PIO_PER  	|= pin_mask;
 
 	/* Unlock */
 	UNLOCK_GPIO(port);
@@ -196,32 +197,32 @@ static int gpio_set_as_per(unsigned int port, unsigned int pin, int pull_up, int
 	/* Pull up resistor */	
 	if (pull_up){
 
-		__at91reg->pio[port]->PIO_PUER |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUER |= (1 << pin);
 	}
 	else{
-		__at91reg->pio[port]->PIO_PUDR |= (1 << pin);
+		__at91reg.pio[port]->PIO_PUDR |= (1 << pin);
 	}
 
 	/* Disable interrupt */
-	__at91reg->pio[port]->PIO_IDR	|=	(1 << pin);
+	__at91reg.pio[port]->PIO_IDR	|=	(1 << pin);
 
 	/* Disable output */
-	__at91reg->pio[port]->PIO_ODR	|=	(1 << pin);
+	__at91reg.pio[port]->PIO_ODR	|=	(1 << pin);
 
 	/* Disable multi-driver */
-	__at91reg->pio[port]->PIO_MDDR	|=	(1 << pin);
+	__at91reg.pio[port]->PIO_MDDR	|=	(1 << pin);
 
 	/* Disable glitch filter */ 
-	__at91reg->pio[port]->PIO_IFDR	|=	(1 << pin);
+	__at91reg.pio[port]->PIO_IFDR	|=	(1 << pin);
 
 	/* Disable pio controller */
-	__at91reg->pio[port]->PIO_PDR	|=	(1 << pin);
+	__at91reg.pio[port]->PIO_PDR	|=	(1 << pin);
 
 	/* Enable peripheralfunction */
 	switch (ab){
 
-		case AT91_PIO_PERA:	__at91reg->pio[port]->PIO_ASR	|=	(1 << pin);break;
-		case AT91_PIO_PERB: __at91reg->pio[port]->PIO_BSR	|=	(1 << pin);break;
+		case AT91_PIO_PERA:	__at91reg.pio[port]->PIO_ASR	|=	(1 << pin);break;
+		case AT91_PIO_PERB: __at91reg.pio[port]->PIO_BSR	|=	(1 << pin);break;
 	}
 	
 	/* Unlock */
@@ -269,10 +270,10 @@ int gpio_get_pin_desc(unsigned int port, unsigned int pin)
 	LOCK_GPIO(port);
 
 	/* First check if peripheral is active or not */
-	if (!(__at91reg->pio[port]->PIO_PSR & (1 << pin))){
+	if (!(__at91reg.pio[port]->PIO_PSR & (1 << pin))){
 
 		/* check which function is enabled */	
-		if (__at91reg->pio[port]->PIO_ABSR & (1 << pin)){
+		if (__at91reg.pio[port]->PIO_ABSR & (1 << pin)){
 
 			st = AT91_PIO_PERA;
 		}
@@ -285,7 +286,7 @@ int gpio_get_pin_desc(unsigned int port, unsigned int pin)
 	else{
 		
 		/* Check pin is in or out */
-		if (__at91reg->pio[port]->PIO_OSR & (1 << pin)){
+		if (__at91reg.pio[port]->PIO_OSR & (1 << pin)){
 
 			st = AT91_PIO_OUT;
 		}
@@ -324,12 +325,12 @@ int gpio_pin_oper(unsigned int port, unsigned int pin, unsigned int oper)
 	/* Set pin */
 	if (oper){
 
-		__at91reg->pio[port]->PIO_SODR |=	(1 << pin);
+		__at91reg.pio[port]->PIO_SODR |=	(1 << pin);
 	}
 	/* Clear pin */
 	else{
 
-		__at91reg->pio[port]->PIO_CODR |=	(1 << pin);
+		__at91reg.pio[port]->PIO_CODR |=	(1 << pin);
 	}
 
 	/* Unlock */
@@ -428,8 +429,8 @@ int gpio_get_pin(unsigned int port, unsigned int pin, unsigned int *data)
 
 		case AT91_PIO_OUT	:	
 		case AT91_PIO_PERA	:
-		case AT91_PIO_PERB	:	*data = (__at91reg->pio[port]->PIO_ODSR & (1 << pin)) >> pin;break;
-		case AT91_PIO_IN	:	*data = (__at91reg->pio[port]->PIO_PDSR & (1 << pin)) >> pin;break;
+		case AT91_PIO_PERB	:	*data = (__at91reg.pio[port]->PIO_ODSR & (1 << pin)) >> pin;break;
+		case AT91_PIO_IN	:	*data = (__at91reg.pio[port]->PIO_PDSR & (1 << pin)) >> pin;break;
 	}
 
 	/* Unlock */
@@ -466,33 +467,33 @@ int gpio_raw_rw(unsigned int port, unsigned int reg, unsigned int rw, unsigned i
 		switch (reg){
 
 			/* Pio status */
-			case 	GPIO_PSR	:	*data	=	__at91reg->pio[port]->PIO_PSR;break;
+			case 	GPIO_PSR	:	*data	=	__at91reg.pio[port]->PIO_PSR;break;
 
 			/* Output status */
-			case 	GPIO_OSR	:	*data	=	__at91reg->pio[port]->PIO_OSR;break;
+			case 	GPIO_OSR	:	*data	=	__at91reg.pio[port]->PIO_OSR;break;
 
 			/* Input filter */
-			case 	GPIO_IFSR	:	*data	=	__at91reg->pio[port]->PIO_IFSR;break;
+			case 	GPIO_IFSR	:	*data	=	__at91reg.pio[port]->PIO_IFSR;break;
 	
 			/* Output and input status */
-			case 	GPIO_ODSR	:	*data	=	__at91reg->pio[port]->PIO_ODSR;break;
-			case 	GPIO_PDSR	:	*data	=	__at91reg->pio[port]->PIO_PDSR;break;
+			case 	GPIO_ODSR	:	*data	=	__at91reg.pio[port]->PIO_ODSR;break;
+			case 	GPIO_PDSR	:	*data	=	__at91reg.pio[port]->PIO_PDSR;break;
 	
 			/* Interrupt */
-			case 	GPIO_IMR	:	*data	=	__at91reg->pio[port]->PIO_IMR;break;
-			case 	GPIO_ISR	:	*data	=	__at91reg->pio[port]->PIO_ISR;break;
+			case 	GPIO_IMR	:	*data	=	__at91reg.pio[port]->PIO_IMR;break;
+			case 	GPIO_ISR	:	*data	=	__at91reg.pio[port]->PIO_ISR;break;
 	
 			/* Multi-driver */
-			case 	GPIO_MDSR	:	*data	=	__at91reg->pio[port]->PIO_MDSR;break;
+			case 	GPIO_MDSR	:	*data	=	__at91reg.pio[port]->PIO_MDSR;break;
 			
 			/* Pull-up */
-			case 	GPIO_PUSR	:	*data	=	__at91reg->pio[port]->PIO_PUSR;break;
+			case 	GPIO_PUSR	:	*data	=	__at91reg.pio[port]->PIO_PUSR;break;
 		
 			/* Peripheral a, b */
-			case 	GPIO_ABSR	:	*data	=	__at91reg->pio[port]->PIO_ABSR;break;
+			case 	GPIO_ABSR	:	*data	=	__at91reg.pio[port]->PIO_ABSR;break;
 			
 			/* Ouput write */
-			case 	GPIO_OWSR	:	*data	=	__at91reg->pio[port]->PIO_OWSR;break;
+			case 	GPIO_OWSR	:	*data	=	__at91reg.pio[port]->PIO_OWSR;break;
 
 			default	:	fprintf(stderr, "This register[%u] is write-only!\n", reg); ret = -1;break;
 		}	
@@ -503,41 +504,41 @@ int gpio_raw_rw(unsigned int port, unsigned int reg, unsigned int rw, unsigned i
 		switch (reg){
 
 			/* Pio enable, disable, status */
-			case 	GPIO_PER	:	__at91reg->pio[port]->PIO_PER	|=	*data;break;
-			case 	GPIO_PDR	:	__at91reg->pio[port]->PIO_PDR	|=	*data;break;
+			case 	GPIO_PER	:	__at91reg.pio[port]->PIO_PER	|=	*data;break;
+			case 	GPIO_PDR	:	__at91reg.pio[port]->PIO_PDR	|=	*data;break;
 
 			/* Output enable, disable, status */
-			case 	GPIO_OER	:	__at91reg->pio[port]->PIO_OER	|=	*data;break;
-			case 	GPIO_ODR	:	__at91reg->pio[port]->PIO_ODR	|=	*data;break;
+			case 	GPIO_OER	:	__at91reg.pio[port]->PIO_OER	|=	*data;break;
+			case 	GPIO_ODR	:	__at91reg.pio[port]->PIO_ODR	|=	*data;break;
 
 			/* Input filter */
-			case 	GPIO_IFER	:	__at91reg->pio[port]->PIO_IFER	|=	*data;break;
-			case 	GPIO_IFDR	:	__at91reg->pio[port]->PIO_IFDR	|=	*data;break;
+			case 	GPIO_IFER	:	__at91reg.pio[port]->PIO_IFER	|=	*data;break;
+			case 	GPIO_IFDR	:	__at91reg.pio[port]->PIO_IFDR	|=	*data;break;
 	
 			/* Set and clear output */
-			case 	GPIO_SODR	:	__at91reg->pio[port]->PIO_SODR	|=	*data;break;
-			case 	GPIO_CODR	:	__at91reg->pio[port]->PIO_CODR	|=	*data;break;
-			case 	GPIO_ODSR	:	__at91reg->pio[port]->PIO_ODSR	=	*data;break;
+			case 	GPIO_SODR	:	__at91reg.pio[port]->PIO_SODR	|=	*data;break;
+			case 	GPIO_CODR	:	__at91reg.pio[port]->PIO_CODR	|=	*data;break;
+			case 	GPIO_ODSR	:	__at91reg.pio[port]->PIO_ODSR	=	*data;break;
 	
 			/* Interrupt */
-			case 	GPIO_IER	:	__at91reg->pio[port]->PIO_IER	|=	*data;break;
-			case 	GPIO_IDR	:	__at91reg->pio[port]->PIO_IDR	|=	*data;break;
+			case 	GPIO_IER	:	__at91reg.pio[port]->PIO_IER	|=	*data;break;
+			case 	GPIO_IDR	:	__at91reg.pio[port]->PIO_IDR	|=	*data;break;
 	
 			/* Multi-driver */
-			case 	GPIO_MDER	:	__at91reg->pio[port]->PIO_MDER	|=	*data;break;
-			case 	GPIO_MDDR	:	__at91reg->pio[port]->PIO_MDDR	|=	*data;break;
+			case 	GPIO_MDER	:	__at91reg.pio[port]->PIO_MDER	|=	*data;break;
+			case 	GPIO_MDDR	:	__at91reg.pio[port]->PIO_MDDR	|=	*data;break;
 			
 			/* Pull-up */
-			case 	GPIO_PUDR	:	__at91reg->pio[port]->PIO_PUDR	|=	*data;break;
-			case 	GPIO_PUER	:	__at91reg->pio[port]->PIO_PUER	|=	*data;break;
+			case 	GPIO_PUDR	:	__at91reg.pio[port]->PIO_PUDR	|=	*data;break;
+			case 	GPIO_PUER	:	__at91reg.pio[port]->PIO_PUER	|=	*data;break;
 		
 			/* Peripheral a, b */
-			case 	GPIO_ASR	:	__at91reg->pio[port]->PIO_ASR	|=	*data;break;
-			case 	GPIO_BSR	:	__at91reg->pio[port]->PIO_BSR	|=	*data;break;
+			case 	GPIO_ASR	:	__at91reg.pio[port]->PIO_ASR	|=	*data;break;
+			case 	GPIO_BSR	:	__at91reg.pio[port]->PIO_BSR	|=	*data;break;
 			
 			/* Ouput write */
-			case 	GPIO_OWER	:	__at91reg->pio[port]->PIO_OWER	|=	*data;break;
-			case 	GPIO_OWDR	:	__at91reg->pio[port]->PIO_OWDR	|=	*data;break;
+			case 	GPIO_OWER	:	__at91reg.pio[port]->PIO_OWER	|=	*data;break;
+			case 	GPIO_OWDR	:	__at91reg.pio[port]->PIO_OWDR	|=	*data;break;
 
 			default	:	fprintf(stderr, "This register[%u] is read-only!\n", reg); ret = -1;break;
 		}	

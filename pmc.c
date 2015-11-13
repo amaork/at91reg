@@ -1,4 +1,4 @@
-#include "at91reg_api.h"
+#include "at91reg.h"
 #include "lock.h"
 
 
@@ -19,12 +19,12 @@ int pmc_peripheral_endis(unsigned int per_id, unsigned int endis)
 	/* Enable peripheral */	
 	if (endis){
 
-		__at91reg->pmc->PMC_PCER |=	(1 << per_id);
+		__at91reg.pmc->PMC_PCER |=	(1 << per_id);
 	}
 	/* Disable peripheral */
 	else{
 
-		__at91reg->pmc->PMC_PCDR |=	(1 << per_id);
+		__at91reg.pmc->PMC_PCDR |=	(1 << per_id);
 	}
 
 	/* Unlock pmc */
@@ -49,7 +49,7 @@ int pmc_peripheral_status(unsigned int per_id)
 	LOCK_PMC();
 
 	/* Get status */
-	st = (__at91reg->pmc->PMC_PCSR & (1 << per_id)) >> per_id;
+	st = (__at91reg.pmc->PMC_PCSR & (1 << per_id)) >> per_id;
 	
 	/* Unlock pmc */	
 	UNLOCK_PMC();
@@ -79,21 +79,21 @@ int pmc_raw_rw(unsigned int reg, unsigned int rw, unsigned int *data)
 
 		switch (reg){
 	
-			case	PMCR_SCSR		:	*data = __at91reg->pmc->PMC_SCSR;break;	
+			case	PMCR_SCSR		:	*data = __at91reg.pmc->PMC_SCSR;break;	
 
-			case	PMCR_PCSR		:	*data = __at91reg->pmc->PMC_PCSR;break;	
+			case	PMCR_PCSR		:	*data = __at91reg.pmc->PMC_PCSR;break;	
 
-			case	PMCR_CKGR_MOR	:	*data = __at91reg->pmc->PMC_MOR;break;	
-			case	PMCR_CKGR_MCFR	:	*data = __at91reg->pmc->PMC_MCFR;break;	
-			case	PMCR_CKGR_PLLAR	:	*data = __at91reg->pmc->PMC_PLLAR;break;	
-			case	PMCR_CKGR_PLLBR	:	*data = __at91reg->pmc->PMC_PLLBR;break;	
+			case	PMCR_CKGR_MOR	:	*data = __at91reg.pmc->PMC_MOR;break;	
+			case	PMCR_CKGR_MCFR	:	*data = __at91reg.pmc->PMC_MCFR;break;	
+			case	PMCR_CKGR_PLLAR	:	*data = __at91reg.pmc->PMC_PLLAR;break;	
+			case	PMCR_CKGR_PLLBR	:	*data = __at91reg.pmc->PMC_PLLBR;break;	
 
-			case	PMCR_MCKR		:	*data = __at91reg->pmc->PMC_MCKR;break;	
-			case	PMCR_PCK0		:	*data = __at91reg->pmc->PMC_PCK0;break;	
-			case	PMCR_PCK1		:	*data = __at91reg->pmc->PMC_PCK1;break;	
+			case	PMCR_MCKR		:	*data = __at91reg.pmc->PMC_MCKR;break;	
+			case	PMCR_PCK0		:	*data = __at91reg.pmc->PMC_PCK0;break;	
+			case	PMCR_PCK1		:	*data = __at91reg.pmc->PMC_PCK1;break;	
 
-			case	PMCR_SR			:	*data = __at91reg->pmc->PMC_SR;break;	
-			case	PMCR_IMR		:	*data = __at91reg->pmc->PMC_IMR;break;	
+			case	PMCR_SR			:	*data = __at91reg.pmc->PMC_SR;break;	
+			case	PMCR_IMR		:	*data = __at91reg.pmc->PMC_IMR;break;	
 			
 			default	:	fprintf(stderr, "This register[%u] is write-only!\n", reg); ret = -1;break;
 		}
@@ -104,24 +104,24 @@ int pmc_raw_rw(unsigned int reg, unsigned int rw, unsigned int *data)
 		
 		switch (reg){
 	
-			case	PMCR_SCER		:	__at91reg->pmc->PMC_SCER	|=	*data;break;	
-			case	PMCR_SCDR		:	__at91reg->pmc->PMC_SCDR	|=	*data;break;	
+			case	PMCR_SCER		:	__at91reg.pmc->PMC_SCER	|=	*data;break;	
+			case	PMCR_SCDR		:	__at91reg.pmc->PMC_SCDR	|=	*data;break;	
 
-			case	PMCR_PCER		:	__at91reg->pmc->PMC_PCER	|=	*data;break;	
-			case	PMCR_PCDR		:	__at91reg->pmc->PMC_PCDR	|=	*data;break;	
+			case	PMCR_PCER		:	__at91reg.pmc->PMC_PCER	|=	*data;break;	
+			case	PMCR_PCDR		:	__at91reg.pmc->PMC_PCDR	|=	*data;break;	
 
-			case	PMCR_CKGR_MOR	:	__at91reg->pmc->PMC_MOR		|=	*data;break;	
-			case	PMCR_CKGR_PLLAR	:	__at91reg->pmc->PMC_PLLAR	|=	*data;break;	
-			case	PMCR_CKGR_PLLBR	:	__at91reg->pmc->PMC_PLLBR	|=	*data;break;	
+			case	PMCR_CKGR_MOR	:	__at91reg.pmc->PMC_MOR		|=	*data;break;	
+			case	PMCR_CKGR_PLLAR	:	__at91reg.pmc->PMC_PLLAR	|=	*data;break;	
+			case	PMCR_CKGR_PLLBR	:	__at91reg.pmc->PMC_PLLBR	|=	*data;break;	
 
-			case	PMCR_MCKR		:	__at91reg->pmc->PMC_MCKR	|=	*data;break;	
-			case	PMCR_PCK0		:	__at91reg->pmc->PMC_PCK0	|=	*data;break;	
-			case	PMCR_PCK1		:	__at91reg->pmc->PMC_PCK1	|=	*data;break;	
+			case	PMCR_MCKR		:	__at91reg.pmc->PMC_MCKR	|=	*data;break;	
+			case	PMCR_PCK0		:	__at91reg.pmc->PMC_PCK0	|=	*data;break;	
+			case	PMCR_PCK1		:	__at91reg.pmc->PMC_PCK1	|=	*data;break;	
 
-			case	PMCR_IER		:	__at91reg->pmc->PMC_IER		|=	*data;break;	
-			case	PMCR_IDR		:	__at91reg->pmc->PMC_IDR		|=	*data;break;	
+			case	PMCR_IER		:	__at91reg.pmc->PMC_IER		|=	*data;break;	
+			case	PMCR_IDR		:	__at91reg.pmc->PMC_IDR		|=	*data;break;	
 
-			case	PMCR_PLLICPR	:	__at91reg->pmc->PMC_PLLICPR	|=	*data;break;	
+			case	PMCR_PLLICPR	:	__at91reg.pmc->PMC_PLLICPR	|=	*data;break;	
 
 			default	:	fprintf(stderr, "This register[%u] is read-only!\n", reg); ret = -1;break;
 		}
