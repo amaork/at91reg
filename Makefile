@@ -1,7 +1,7 @@
+-include ../.config
+-include ../config.mk
+
 ifeq ($(KERNELRELEASE),)
-
-
-CROSS		:=	arm-none-linux-gnueabi-
 
 KERNELDIR ?=/home/wxidong/workspace/build/build/kernel/2.6.34/linux-2.6.34-802
 CC			=	$(CROSS)gcc
@@ -12,6 +12,8 @@ LDSHFLAGS	=	-rdynamic -shared
 ARFLAGS		=	rcv
 
 
+.PHONY:all clean install module_install
+
 all:libat91reg.a libat91reg.so
 
 libat91reg.a:
@@ -20,15 +22,19 @@ libat91reg.a:
 libat91reg.so:
 	$(CC) $(LDSHFLAGS) -o $@ $^
 
-depend:$(wildcard *.c)
+.depend:$(wildcard *.c *.h)
 	$(CC) $(LDFLAGS) -MM $^ > $@
 
 libat91reg.a: 	init.o gpio.o pmc.o
 libat91reg.so:	init.o gpio.o pmc.o 
 
-
 modules:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+
+install:libat91reg.so
+	@echo "Install At91reg dynamic lib..."
+	@mkdir -p $(LOCAL_PACK_PATH)/$(LIB_PATH)
+	$(if ${LOCAL_PACK_PATH},@cp $^ $(LOCAL_PACK_PATH)/$(LIB_PATH),@cp $^ /usr/local/lib)
 
 modules_install:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
@@ -39,7 +45,7 @@ clean:
 distclean:
 	$(MAKE) clean
 
--include depend
+-include .depend
 
 .PHONY: modules modules_install clean distclean
 
