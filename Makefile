@@ -7,7 +7,7 @@ KERNELDIR ?=/home/wxidong/workspace/build/build/kernel/2.6.34/linux-2.6.34-802
 CC			=	$(CROSS)gcc
 PWD 		:= 	$(shell pwd)
 AR			=	$(CROSS)ar
-CPPFLAGS	=	-Wall
+CPPFLAGS	=	-Wall -fPIC
 LDSHFLAGS	=	-rdynamic -shared  
 ARFLAGS		=	rcv
 
